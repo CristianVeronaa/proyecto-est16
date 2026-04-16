@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Alumno - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-header bg-primary text-white py-3 border-0">
+                        <h5 class="mb-0 fw-bold">Modificar Datos del Alumno</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">NOMBRE(S)</label>
+                                <input type="text" name="nombre" class="form-control" value="{{ alumno.nombre }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">APELLIDOS</label>
+                                <input type="text" name="apellido" class="form-control" value="{{ alumno.apellido }}" required>
+                            </div>
+                            
+                            <hr class="my-4 opacity-10">
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">GRAD0</label>
+                                    <select name="grado" class="form-select" required>
+                                        <option value="1" {{ 'selected' if alumno.grado == 1 }}>1° Año</option>
+                                        <option value="2" {{ 'selected' if alumno.grado == 2 }}>2° Año</option>
+                                        <option value="3" {{ 'selected' if alumno.grado == 3 }}>3° Año</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">GRUPO</label>
+                                    <input type="text" name="grupo" class="form-control" value="{{ alumno.grupo }}" required maxlength="1" style="text-transform: uppercase;">
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label small fw-bold text-muted">TURNO</label>
+                                <select name="turno" class="form-select" required>
+                                    <option value="Matutino" {{ 'selected' if alumno.turno == 'Matutino' }}>Matutino</option>
+                                    <option value="Vespertino" {{ 'selected' if alumno.turno == 'Vespertino' }}>Vespertino</option>
+                                    <option value="Mixto" {{ 'selected' if alumno.turno == 'Mixto' }}>Mixto</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid mt-4 pt-2">
+                                <button type="submit" class="btn btn-primary fw-bold py-2">Actualizar Registro</button>
+                                <a href="/admin/alumnos" class="btn btn-link text-muted small mt-2">Cancelar y Guardar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pagina.titulo }} - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .page-hero {
+            background: linear-gradient(rgba(26, 82, 118, 0.8), rgba(26, 82, 118, 0.9)), 
+                        {% if pagina.imagen_url %} url("/static/uploads/{{ pagina.imagen_url }}") {% else %} url("/static/images/hero-bg.png") {% endif %};
+            background-size: cover;
+            background-position: center;
+            padding: 8rem 0 4rem;
+            color: white;
+            text-align: center;
+        }
+        .content-area {
+            background: white;
+            border-radius: 30px;
+            margin-top: -3rem;
+            padding: 4rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+        .breadcrumb-custom {
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .breadcrumb-custom a { text-decoration: none; color: white; opacity: 0.8; }
+        .breadcrumb-custom span { opacity: 0.5; margin: 0 10px; }
+        
+        .side-menu {
+            background: var(--school-light);
+            padding: 2rem;
+            border-radius: 20px;
+            position: sticky;
+            top: 100px;
+        }
+        .side-menu h5 { color: var(--primary); font-weight: 700; margin-bottom: 1.5rem; }
+        .side-menu .nav-link { color: #64748b !important; padding: 0.8rem 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .side-menu .nav-link:hover { color: var(--primary) !important; padding-left: 10px; }
+        
+        .text-content { line-height: 1.8; color: #334155; font-size: 1.1rem; }
+        .text-content h3 { color: var(--primary); font-weight: 700; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container px-4">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="fas fa-school me-2"></i>
+                <div class="d-none d-sm-block">
+                   <span class="d-block lh-1">EST 16</span>
+                   <small class="fs-6 fw-normal opacity-75">Guillermo Chávez Pérez</small>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link px-3" href="/">Inicio</a></li>
+                    
+                    {% for item in menu_dinamico %}
+                        {% if item.children %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle px-3" href="{{ '#' if item.tipo == 'categoria' else '/p/' + item.slug }}" id="navbarDropdown{{ item.id_pagina }}" role="button" aria-expanded="false">
+                                    {{ item.titulo }}
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="navbarDropdown{{ item.id_pagina }}">
+                                    {% for child in item.children %}
+                                        <li><a class="dropdown-item" href="/p/{{ child.slug }}">{{ child.titulo }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link px-3" href="/p/{{ item.slug }}">{{ item.titulo }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <li class="nav-item"><a class="nav-link px-3" href="/#avisos">Avisos</a></li>
+                    
+                    <!-- Buscador en Navbar -->
+                    <li class="nav-item mx-lg-2">
+                        <form action="/buscar" method="GET" class="d-flex">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="q" class="form-control rounded-start-pill border-0 bg-light px-3" placeholder="Buscar..." style="width: 150px;">
+                                <button class="btn btn-light rounded-end-pill border-0" type="submit">
+                                    <i class="fas fa-search text-primary"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </li>
+
+                    {% if session.get('usuario_id') %}
+                        <li class="nav-item ms-lg-2"><a href="/perfil" class="btn btn-outline-light rounded-pill px-4">Mi Perfil</a></li>
+                    {% else %}
+                        <li class="nav-item ms-lg-2"><a href="/login" class="btn btn-light text-primary rounded-pill px-4 fw-bold shadow-sm">Portal Académico</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <div class="container">
+            <div class="breadcrumb-custom">
+                <a href="/">Inicio</a>
+                {% if padre %}
+                    <span>/</span>
+                    <a href="/p/{{ padre.slug }}">{{ padre.titulo }}</a>
+                {% endif %}
+                <span>/</span>
+                <span style="color: white; opacity: 1;">{{ pagina.titulo }}</span>
+            </div>
+            <h1 class="display-3 fw-bold">{{ pagina.titulo }}</h1>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        <div class="row">
+            <div class="{{ 'col-lg-8' if subpaginas else 'col-lg-10 mx-auto' }}">
+                <div class="content-area">
+                    <div class="text-content">
+                        {{ pagina.contenido.replace('\r\n', '<br>').replace('\n', '<br>') | safe }}
+                    </div>
+                </div>
+            </div>
+
+            {% if subpaginas %}
+            <div class="col-lg-4">
+                <div class="side-menu mt-lg-0 mt-4">
+                    <h5>Más información</h5>
+                    <nav class="nav flex-column">
+                        {% for sub in subpaginas %}
+                            <a class="nav-link" href="/p/{{ sub.slug }}"><i class="fas fa-chevron-right me-2 small"></i> {{ sub.titulo }}</a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container">
+            <p>&copy; 2024 EST 16 - {{ pagina.titulo }}</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Soporte para menús desplegables en móviles (click en lugar de hover)
+        document.addEventListener("DOMContentLoaded", function() {
+            function adjustDropdowns() {
+                if (window.innerWidth < 992) {
+                    document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+                        element.setAttribute('data-bs-toggle', 'dropdown');
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+                        element.removeAttribute('data-bs-toggle');
+                    });
+                }
+            }
+            adjustDropdowns();
+            window.addEventListener('resize', adjustDropdowns);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Profesor - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">EST 16</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/perfil">Mi Perfil</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="/logout" class="btn btn-outline-light btn-sm px-3 rounded-pill">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card bg-primary text-white mb-5 border-0 shadow-lg" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+            <div class="card-body p-5 text-center position-relative overflow-hidden rounded-4">
+                <span class="badge bg-light text-primary px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold">PORTAL DOCENTE</span>
+                <h1 class="fw-bold display-4 text-white mb-3 position-relative z-1">Bienvenido, Profesor</h1>
+                <p class="lead text-white opacity-75 position-relative z-1 mb-0">Gestiona tus grupos, captura calificaciones y pasa asistencia de forma rápida.</p>
+                <i class="fas fa-chalkboard-teacher fa-10x position-absolute opacity-10 end-0 bottom-0 me-4 mb-n5" style="transform: rotate(-10deg);"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-chalkboard-teacher me-2 text-primary"></i> Mis Materias y Grupos</h4>
+        
+        {% if clases %}
+        <div class="row g-4">
+            {% for c in clases %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary text-white rounded-circle shadow-sm" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+                                <i class="fas fa-book fs-3"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold text-dark mb-1">{{ c.materia }}</h5>
+                                <p class="text-secondary small mb-0 fw-medium">{{ c.grado }}° Grado | Grupo "{{ c.grupo }}"</p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm"><i class="fas fa-clock text-primary me-1"></i> Turno {{ c.turno }}</span>
+                        </div>
+                        <div class="mt-auto">
+                            <a href="{{ url_for('lista_alumnos', grado=c.grado, grupo=c.grupo, materia=c.materia, turno=c.turno) }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold border-2">
+                                <i class="fas fa-arrow-right me-2"></i> Gestionar Grupo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card text-center p-5 border-dashed">
+            <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+            <h5>No tienes grupos asignados actualmente</h5>
+            <p class="text-muted">Si crees que esto es un error, por favor contacta al área administrativa.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer py-5 border-top bg-white">
+        <div class="container text-center">
+            <p class="text-muted small">&copy; 2024 Escuela Secundaria Técnica Núm. 16. Sistema de Gestión Docente.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

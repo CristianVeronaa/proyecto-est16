@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Maestros - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --primary: #003366; --border: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .navbar { background: var(--primary) !important; padding: 1rem 0; }
+        .hero-admin { background: #fff; border-bottom: 1px solid var(--border); padding: 40px 0; margin-bottom: 30px; }
+        .card { border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .btn-primary { background: var(--primary); border: none; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; }
+        .btn-primary:hover { background: #002244; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin">Panel Admin</a>
+            <div class="ms-auto">
+                <a href="/admin" class="btn btn-outline-light btn-sm me-2">Regresar</a>
+                <a href="/logout" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-admin">
+        <div class="container">
+            <h1 class="fw-bold text-primary">Asignación de Materias</h1>
+            <p class="text-muted mb-0">Vincula a los docentes con sus respectivos grupos y grados.</p>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row">
+            <!-- FORMULARIO -->
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Nueva Asignación</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">SELECCIONAR DOCENTE</label>
+                                <select name="id_profesor" class="form-select border-2" required>
+                                    <option value="" disabled selected>-- Elegir docente --</option>
+                                    {% for profe in maestros %}
+                                    <option value="{{ profe.id_profesor }}">{{ profe.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">NOMBRE DE LA MATERIA</label>
+                                <input type="text" name="materia" class="form-control" placeholder="Ej: Química 1" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-muted">GRADO</label>
+                                    <select name="grado" class="form-select" required>
+                                        <option value="1">1° Grado</option>
+                                        <option value="2">2° Grado</option>
+                                        <option value="3">3° Grado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-muted">GRUPO</label>
+                                    <input type="text" name="grupo" class="form-control" placeholder="Ej: A" required maxlength="1" style="text-transform: uppercase;">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">TURNO</label>
+                                <select name="turno" class="form-select" required>
+                                    <option value="Matutino">Matutino</option>
+                                    <option value="Vespertino">Vespertino</option>
+                                    <option value="Mixto">Mixto</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mt-2">
+                                <i class="fas fa-plus-circle me-2"></i> Crear Asignación
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA -->
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">Asignaciones Actuales</h5>
+                        <span class="badge bg-light text-primary border">{{ asignaciones|length }} registradas</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if asignaciones %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Docente</th>
+                                        <th>Materia</th>
+                                        <th>G/G/T</th>
+                                        <th class="text-end pe-4">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asig in asignaciones %}
+                                    <tr>
+                                        <td class="ps-4 fw-medium">{{ asig.nombre_profesor }}</td>
+                                        <td>{{ asig.materia }}</td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary border-primary-subtle">{{ asig.grado }}°{{ asig.grupo }}</span>
+                                            <span class="badge bg-secondary-subtle text-secondary border-secondary-subtle small">{{ asig.turno }}</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <form method="POST" action="/admin/eliminar_asignacion/{{ asig.id_asignacion }}" onsubmit="return confirm('¿Eliminar esta asignación?');">
+                                                <button type="submit" class="btn btn-link text-danger p-0" title="Eliminar">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="p-5 text-center text-muted">
+                            <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
+                            <p>No hay materias asignadas a docentes todavía.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-5 border-top bg-white mt-5">
+        <div class="container text-center">
+            <p class="text-muted small">&copy; 2024 Escuela Secundaria Técnica Núm. 16.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

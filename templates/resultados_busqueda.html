@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados: {{ query }} - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .result-tag {
+            font-size: 0.7rem;
+            padding: 5px 12px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .tag-pagina { background: #e0f2fe; color: #0369a1; }
+        .tag-aviso { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">EST 16</a>
+            <form class="d-flex ms-auto" action="/buscar" method="GET">
+                <input class="form-control rounded-pill px-4" type="search" name="q" value="{{ query }}" placeholder="Nueva búsqueda...">
+            </form>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h2 class="fw-bold mb-4">Resultados para: <span class="text-primary">"{{ query }}"</span></h2>
+        <p class="text-muted mb-5">Se encontraron {{ resultados|length }} coincidencias.</p>
+
+        {% if resultados %}
+            <div class="row">
+                <div class="col-lg-9 mx-auto">
+                    {% for item in resultados %}
+                        <div class="result-card">
+                            <span class="result-tag tag-{{ item.tipo_item }}">{{ 'Página Informativa' if item.tipo_item == 'pagina' else 'Aviso / Noticia' }}</span>
+                            <h4 class="fw-bold">{{ item.titulo }}</h4>
+                            <p class="text-muted">{{ item.contenido[:200] }}...</p>
+                            
+                            {% if item.tipo_item == 'pagina' %}
+                                <a href="/p/{{ item.slug }}" class="btn btn-outline-primary rounded-pill px-4">Leer más</a>
+                            {% else %}
+                                <a href="/" class="btn btn-outline-warning rounded-pill px-4">Ver en Inicio</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-4x text-muted mb-3 opacity-25"></i>
+                <h4>No encontramos nada para "{{ query }}"</h4>
+                <p>Intenta con palabras más generales o revisa la ortografía.</p>
+                <a href="/" class="btn btn-primary rounded-pill px-5 mt-3">Volver al Inicio</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

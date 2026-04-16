@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Aviso - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --primary: #003366; --border: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .card { border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .form-label { font-weight: 600; color: #475569; }
+        .adjunto-badge { display: inline-flex; align-items: center; padding: 5px 12px; background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px; margin-right: 5px; margin-bottom: 5px; font-size: 0.85rem; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 p-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin">Panel de Administración</a>
+            <div class="ms-auto">
+                <a href="/" class="btn btn-outline-light btn-sm">Ir al sitio público</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin">Inicio</a></li>
+                        <li class="breadcrumb-item active">Editar Aviso</li>
+                    </ol>
+                </nav>
+
+                <div class="card">
+                    <div class="card-header bg-white py-3">
+                        <h4 class="mb-0 fw-bold text-primary">Editar Aviso</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Título de la publicación</label>
+                                <input type="text" name="titulo" class="form-control" value="{{ pub.titulo }}" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Descripción o Contenido</label>
+                                <textarea name="contenido" class="form-control" rows="8" required>{{ pub.contenido }}</textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Archivos Adjuntos Actuales</label>
+                                <div class="p-3 bg-light rounded-3 border">
+                                    {% if adjuntos %}
+                                        <div class="row g-2">
+                                            {% for adj in adjuntos %}
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="p-2 bg-white border rounded d-flex align-items-center justify-content-between">
+                                                        <div class="d-flex align-items-center overflow-hidden">
+                                                            {% if adj.tipo_archivo == 'imagen' %}
+                                                                <img src="{{ url_for('static', filename='uploads/' + adj.archivo_url) }}" 
+                                                                     style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" class="me-2">
+                                                            {% else %}
+                                                                <i class="fas fa-file-pdf fa-2x me-2 text-danger"></i>
+                                                            {% endif %}
+                                                            <span class="text-truncate small" style="max-width: 100px;">{{ adj.archivo_url }}</span>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex">
+                                                            {% if adj.tipo_archivo == 'imagen' %}
+                                                                {% if pub.imagen_url == adj.archivo_url %}
+                                                                    <span class="badge bg-success small"><i class="fas fa-check"></i> Portada</span>
+                                                                {% else %}
+                                                                    <form action="/admin/cambiar_portada/{{ pub.id_post }}/{{ adj.id_adjunto }}" method="POST">
+                                                                        <button type="submit" class="btn btn-link btn-sm text-primary p-0 text-decoration-none" title="Poner como portada">
+                                                                            <i class="fas fa-star"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="form-check mt-3 text-danger">
+                                            <input class="form-check-input" type="checkbox" name="limpiar_adjuntos" value="si" id="chkLimpiar">
+                                            <label class="form-check-label fw-bold" for="chkLimpiar">
+                                                Eliminar todos los adjuntos actuales y subir nuevos
+                                            </label>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted small mb-0">Esta publicación no tiene archivos adjuntos.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Subir Nuevos Archivos (Opcional)</label>
+                                <input type="file" name="archivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" multiple>
+                                <small class="text-muted">Puedes seleccionar varios archivos. Se añadirán a los existentes a menos que marques la casilla de arriba.</small>
+                            </div>
+
+                            <div class="d-flex gap-3 mt-5">
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" style="background: var(--primary);">
+                                    <i class="fas fa-save me-2"></i> Guardar Cambios
+                                </button>
+                                <a href="/admin" class="btn btn-outline-secondary px-4 py-2">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

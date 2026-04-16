@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .profile-card { max-width: 600px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 3rem; }
+        .avatar-section { text-align: center; margin-bottom: 2.5rem; }
+        .avatar-circle { width: 100px; height: 100px; background: linear-gradient(135deg, #1A5276 0%, #2980B9 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1rem; }
+        .nav-back { position: absolute; top: 2rem; left: 2rem; }
+        .section-divider { height: 1px; background: #e2e8f0; margin: 2rem 0; position: relative; }
+        .section-divider span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 0 1rem; color: #94a3b8; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+    </style>
+</head>
+
+<body>
+    <div class="profile-card position-relative">
+        <div class="avatar-section">
+            <div class="avatar-circle">
+                <i class="fas {{ 'fa-chalkboard-teacher' if session.rol == 'maestro' else 'fa-user-cog' if session.rol == 'admin' else 'fa-user-friends' }}"></i>
+            </div>
+            <h3 class="fw-bold mb-0">Mi Perfil</h3>
+            <p class="text-muted">Gestiona tu información personal</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="row">
+                <!-- CURP (Inmutable) -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-bold">CURP (No editable)</label>
+                    <input type="text" class="form-control bg-light" value="{{ datos.curp }}" readonly disabled>
+                </div>
+
+                <!-- Email (Editable) -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-bold">Correo Electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                        <input type="email" name="email" class="form-control border-start-0" value="{{ datos.email or '' }}" placeholder="ejemplo@correo.com" required>
+                    </div>
+                </div>
+
+                <!-- Teléfono (Editable) -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-bold">Teléfono de Recuperación</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-phone text-muted"></i></span>
+                        <input type="tel" name="telefono" class="form-control border-start-0" value="{{ datos.telefono or '' }}" placeholder="10 dígitos" maxlength="10">
+                    </div>
+                </div>
+
+                <!-- Nombre (Editable solo para maestros) -->
+                {% if session.rol == 'maestro' %}
+                <div class="col-12 mb-3">
+                    <label class="form-label small fw-bold">Nombre Completo</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-edit text-muted"></i></span>
+                        <input type="text" name="nombre" class="form-control border-start-0" value="{{ datos.nombre or '' }}" placeholder="Tu nombre" required>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="section-divider">
+                <span>Seguridad</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-primary">Contraseña Actual (Para cambios)</label>
+                <input type="password" name="pass_actual" class="form-control" placeholder="••••••••">
+                <small class="text-muted">Ingresa tu clave actual solo si deseas cambiarla.</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-bold">Nueva Contraseña</label>
+                    <input type="password" name="pass_nueva" class="form-control" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small fw-bold">Confirmar Nueva Clave</label>
+                    <input type="password" name="pass_confirm" class="form-control" placeholder="Repite la clave">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mt-3 shadow">
+                <i class="fas fa-save me-2"></i>Guardar Todos los Cambios
+            </button>
+            
+            <div class="text-center mt-4">
+                {% if session.rol == 'admin' %}
+                    <a href="/admin" class="text-decoration-none small fw-bold"><i class="fas fa-arrow-left me-1"></i> Volver al Panel</a>
+                {% elif session.rol == 'maestro' %}
+                    <a href="/profe_dashboard" class="text-decoration-none small fw-bold"><i class="fas fa-arrow-left me-1"></i> Volver al Panel</a>
+                {% else %}
+                    <a href="/dashboard" class="text-decoration-none small fw-bold"><i class="fas fa-arrow-left me-1"></i> Volver al Portal</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

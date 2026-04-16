@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - EST 16</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="/">
+                <span>EST 16</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/perfil">Mi Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/logout" class="btn btn-logout ms-2">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card bg-primary text-white mb-5 border-0 shadow-lg" style="background: linear-gradient(135deg, #1A5276 0%, #2980B9 100%);">
+            <div class="card-body p-5 text-center position-relative overflow-hidden rounded-4">
+                <span class="badge bg-light text-primary px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold">PORTAL ADMINISTRATIVO</span>
+                <h1 class="fw-bold display-4 text-white mb-3 position-relative z-1">Centro de Control</h1>
+                <p class="lead text-white opacity-75 position-relative z-1 mb-0">Gestiona usuarios, alumnos, contenido académico y avisos institucionales.</p>
+                <i class="fas fa-cogs fa-10x position-absolute opacity-10 end-0 bottom-0 me-4 mb-n5" style="transform: rotate(15deg);"></i>
+            </div>
+        </div>
+
+    <div class="container px-0">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- MENU DE ACCIONES -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <a href="/admin/usuarios" class="card text-decoration-none text-dark h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                            <i class="fas fa-users-cog fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Usuarios</h5>
+                        <p class="text-secondary small mb-0">Aprobación de padres y maestros</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="/admin/alumnos" class="card text-decoration-none text-dark h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-info text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                            <i class="fas fa-user-graduate fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Alumnos</h5>
+                        <p class="text-secondary small mb-0">Control escolar e incidencias</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="/admin/paginas" class="card text-decoration-none text-dark h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-success text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                            <i class="fas fa-file-alt fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Sitio Web</h5>
+                        <p class="text-secondary small mb-0">Gestión de menús y páginas (CMS)</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="/admin/asignar_maestros" class="card text-decoration-none text-dark h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-secondary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                            <i class="fas fa-book-reader fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Asignaciones</h5>
+                        <p class="text-secondary small mb-0">Carga académica de materias</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE PUBLICACIÓN -->
+        <div class="card border-0 shadow-sm rounded-4 mb-5">
+            <div class="card-header bg-white border-bottom p-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-bullhorn text-primary me-2"></i> Publicar Nuevo Aviso General</h5>
+            </div>
+            <div class="card-body p-4 bg-light">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Título del aviso</label>
+                        <input type="text" name="titulo" class="form-control" 
+                               placeholder="ej: Convocatoria Becas, Cambio de Horario, etc." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="contenido" class="form-control" rows="5" 
+                                  placeholder="Escribe el contenido del aviso..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Adjuntar archivos (Imágenes o Documentos)</label>
+                        <input type="file" name="archivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" multiple>
+                        <small class="form-text text-muted">Puedes seleccionar varios archivos dejando presionado Ctrl.</small>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm fw-bold">
+                            <i class="fas fa-paper-plane me-2"></i> Publicar Aviso
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- LISTA DE PUBLICACIONES -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Publicaciones Activas</h5>
+            </div>
+            <div class="card-body">
+                {% if publicaciones %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Contenido</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pub in publicaciones %}
+                                <tr>
+                                    <td><strong>{{ pub.titulo }}</strong></td>
+                                    <td>{{ pub.contenido[:60] }}...</td>
+                                    <td>{{ pub.fecha_creacion if pub.fecha_creacion else 'Sin fecha' }}</td>
+                                    <td>
+                                        <a href="/admin/editar_publicacion/{{ pub.id_post }}" 
+                                           class="btn btn-warning btn-sm">Editar</a>
+                                        <form method="POST" action="/admin/eliminar_publicacion/{{ pub.id_post }}" 
+                                              style="display: inline;" onsubmit="return confirm('¿Estás seguro?');">
+                                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center py-4">
+                        <h6>No hay publicaciones</h6>
+                        <p>Los avisos que publiques aparecerán aquí</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 EST 16 - Panel Administrativo</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

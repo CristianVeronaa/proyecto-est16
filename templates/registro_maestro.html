@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Maestros - EST 16</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for sleek icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root {
+            --teacher-primary: #1A5276;
+            --teacher-secondary: #2471A3;
+            --teacher-accent: #EBF5FB;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #1A5276 0%, #0E6251 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .registro-container {
+            width: 100%;
+            max-width: 500px;
+            perspective: 1000px;
+        }
+
+        .registro-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .registro-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--teacher-accent);
+            color: var(--teacher-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(26, 82, 118, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .registro-card:hover .icon-circle {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .registro-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--teacher-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .registro-header p {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group-text {
+            background-color: transparent;
+            border-right: none;
+            color: #94a3b8;
+            padding-left: 1.25rem;
+        }
+
+        .form-control {
+            border-left: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0 12px 12px 0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group-text {
+            border: 1px solid #e2e8f0;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: var(--teacher-primary);
+        }
+
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: var(--teacher-primary);
+            color: var(--teacher-primary);
+        }
+
+        .btn-registro {
+            background: linear-gradient(135deg, var(--teacher-primary) 0%, var(--teacher-secondary) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(26, 82, 118, 0.3);
+        }
+
+        .btn-registro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(26, 82, 118, 0.4);
+        }
+
+        .btn-registro:active {
+            transform: translateY(0);
+        }
+
+        .requirements-box {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #64748b;
+            border: 1px solid #f1f5f9;
+        }
+
+        .requirements-box ul {
+            padding-left: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        .requirements-box li {
+            margin-bottom: 0.25rem;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .login-footer a {
+            color: var(--teacher-primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Float Labels effect or simple placeholders */
+        ::placeholder {
+            color: #cbd5e1;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="registro-container">
+        <div class="registro-card">
+            <div class="registro-header">
+                <div class="icon-circle">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h1>Registro de Nuevo Docente</h1>
+                <p>Ingresa los datos del maestro para crear su acceso al sistema</p>
+            </div>
+
+            <!-- Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show" role="alert">
+                            <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-triangle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('registro_maestro') }}" method="POST" id="registroForm">
+                <!-- Nombre Completo -->
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre Completo</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: Juan Pérez López" required minlength="3">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="ejemplo@correo.com" required>
+                    </div>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="mb-3">
+                    <label for="telefono" class="form-label">Número de Teléfono</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="10 dígitos" maxlength="10" required>
+                    </div>
+                </div>
+
+                <!-- CURP -->
+                <div class="mb-3">
+                    <label for="curp" class="form-label">CURP (18 caracteres)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" class="form-control" id="curp" name="curp" placeholder="Ingrese su CURP" maxlength="18" required style="text-transform: uppercase;">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div class="mb-3">
+                    <label for="password_confirm" class="form-label">Confirmar Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                        <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Repita su contraseña" required>
+                    </div>
+                </div>
+
+                <div class="requirements-box">
+                    <strong>Requisitos de acceso:</strong>
+                    <ul>
+                        <li><i class="fas fa-check-circle me-1"></i> CURP oficial a 18 dígitos</li>
+                        <li><i class="fas fa-check-circle me-1"></i> Contraseña de al menos 6 caracteres</li>
+                        <li><i class="fas fa-check-circle me-1"></i> Ambos campos de contraseña deben coincidir</li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-registro w-100">
+                    <i class="fas fa-save me-2"></i> Guardar y Registrar Maestro
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p><a href="{{ url_for('admin') }}"><i class="fas fa-arrow-left me-1"></i> Volver al Panel de Administración</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form Validation UI
+        const form = document.getElementById('registroForm');
+        const curpInput = document.getElementById('curp');
+        const passInput = document.getElementById('password');
+        const passConfInput = document.getElementById('password_confirm');
+
+        curpInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+            if (this.value.length === 18) {
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+
+        passConfInput.addEventListener('input', function() {
+            if (this.value === passInput.value && this.value !== "") {
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+            } else {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            if (curpInput.value.length !== 18) {
+                e.preventDefault();
+                alert('El CURP debe tener exactamente 18 caracteres.');
+            } else if (passInput.value !== passConfInput.value) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden.');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Editar' if modo == 'editar' else 'Crear' }} Página - EST 16</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/paginas"><i class="fas fa-arrow-left me-2"></i>Volver a la lista</a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0 fw-bold">{{ 'Editar Página' if modo == 'editar' else 'Crear Nueva Página' }}</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="row g-4">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label class="form-label">Título de la Página</label>
+                                        <input type="text" name="titulo" class="form-control" value="{{ pagina.titulo if pagina else '' }}" required placeholder="Ej: Himno Nacional">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">URL Friendly (Slug)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">/p/</span>
+                                            <input type="text" name="slug" class="form-control" value="{{ pagina.slug if pagina else '' }}" required placeholder="himno-nacional">
+                                        </div>
+                                        <small class="text-muted">Evita espacios y caracteres especiales.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de Contenido</label>
+                                        <select name="tipo" class="form-select">
+                                            <option value="pagina" {{ 'selected' if pagina and pagina.tipo == 'pagina' else '' }}>Página Informativa</option>
+                                            <option value="taller" {{ 'selected' if pagina and pagina.tipo == 'taller' else '' }}>Taller Tecnológico</option>
+                                            <option value="categoria" {{ 'selected' if pagina and pagina.tipo == 'categoria' else '' }}>Categoría (Solo agrupa en Menú)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Página Padre (Escribe para buscar)</label>
+                                        <input type="text" list="listaPadres" id="padre_nombre" class="form-control" 
+                                               placeholder="Escribe el nombre de la página padre..." 
+                                               value="{% for p in padres %}{% if pagina and pagina.id_padre == p.id_pagina %}{{ p.titulo }}{% endif %}{% endfor %}">
+                                        <input type="hidden" name="id_padre" id="id_padre_hidden" value="{{ pagina.id_padre if pagina else '' }}">
+                                        
+                                        <datalist id="listaPadres">
+                                            <option value="Ninguna (Página Principal)" data-id="">
+                                            {% for p in padres %}
+                                                <option value="{{ p.titulo }}" data-id="{{ p.id_pagina }}">
+                                            {% endfor %}
+                                        </datalist>
+                                        <small class="text-muted">Si no seleccionas nada, será una página principal.</small>
+                                    </div>
+
+                                    <script>
+                                        // Lógica para sincronizar el nombre del padre con su ID oculto
+                                        document.getElementById('padre_nombre').addEventListener('input', function() {
+                                            const val = this.value;
+                                            const options = document.getElementById('listaPadres').options;
+                                            let foundId = "";
+                                            
+                                            for(let i = 0; i < options.length; i++) {
+                                                if(options[i].value === val) {
+                                                    foundId = options[i].getAttribute('data-id');
+                                                    break;
+                                                }
+                                            }
+                                            document.getElementById('id_padre_hidden').value = foundId;
+                                        });
+                                    </script>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Contenido (Texto o HTML)</label>
+                                        <textarea name="contenido" class="form-control" rows="15" placeholder="Escribe aquí la información detallada...">{{ pagina.contenido if pagina else '' }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Imagen Destacada</label>
+                                        <input type="file" name="archivo" class="form-control" accept="image/*">
+                                        {% if pagina and pagina.imagen_url %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">Imagen actual: {{ pagina.imagen_url }}</small>
+                                                <img src="/static/uploads/{{ pagina.imagen_url }}" class="d-block mt-2 img-thumbnail" style="height: 100px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Configuración</label>
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" name="mostrar_en_inicio" value="1" {{ 'checked' if pagina and pagina.mostrar_en_inicio else '' }}>
+                                            <label class="form-check-label">Mostrar en página de Inicio</label>
+                                        </div>
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" name="mostrar_en_menu" value="1" {{ 'checked' if pagina and pagina.mostrar_en_menu else '' }}>
+                                            <label class="form-check-label">Aparecer en Menú Principal</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Prioridad en Menú (Orden)</label>
+                                            <input type="number" name="orden_menu" class="form-control" value="{{ pagina.orden_menu if pagina else 0 }}" min="0">
+                                            <small class="text-muted">Números bajos aparecen primero.</small>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <label class="form-label mb-0">Estado:</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="estado" value="publicado" {{ 'checked' if not pagina or pagina.estado == 'publicado' else '' }}>
+                                                <label class="form-check-label">Publicado</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="estado" value="borrador" {{ 'checked' if pagina and pagina.estado == 'borrador' else '' }}>
+                                                <label class="form-check-label">Borrador</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 text-end border-top pt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+                                        <i class="fas fa-save me-2"></i>{{ 'Guardar Cambios' if modo == 'editar' else 'Crear Página' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

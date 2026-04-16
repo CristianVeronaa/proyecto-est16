@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Alumnos - EST 16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin">Panel Admin</a>
+            <div class="ms-auto">
+                <a href="/admin/registrar_alumno" class="btn btn-success btn-sm me-2">+ Nuevo Alumno</a>
+                <a href="/admin" class="btn btn-outline-light btn-sm">Regresar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary mb-0">Listado de Estudiantes</h2>
+            <span class="badge bg-white text-primary border px-3 py-2" id="alumnoCount">{{ alumnos|length }} Alumnos</span>
+        </div>
+
+        <!-- FILTROS DE BÚSQUEDA -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o CURP tutor...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="gradoFilter" class="form-select">
+                    <option value="">Todos los Grados</option>
+                    <option value="1">1° Grado</option>
+                    <option value="2">2° Grado</option>
+                    <option value="3">3° Grado</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="turnoFilter" class="form-select">
+                    <option value="">Todos los Turnos</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Mixto">Mixto</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Nombre Completo</th>
+                                <th>Grado/Grupo</th>
+                                <th>Turno</th>
+                                <th>Tutor (CURP)</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                            <tbody id="alumnosTableBody">
+                                {% for alu in alumnos %}
+                                <tr class="alumno-row" data-grado="{{ alu.grado }}" data-turno="{{ alu.turno }}">
+                                <td class="ps-4">
+                                    <div class="fw-bold">{{ alu.nombre }} {{ alu.apellido }}</div>
+                                    <small class="text-muted">ID: #{{ alu.id_alumno }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                        {{ alu.grado }}° {{ alu.grupo }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'bg-warning-subtle text-dark border-warning' if alu.turno == 'Matutino' else ('bg-dark-subtle text-dark border-dark' if alu.turno == 'Vespertino' else 'bg-info-subtle text-dark border-info') }} border">
+                                        <i class="fas {{ 'fa-sun text-warning' if alu.turno == 'Matutino' else ('fa-moon text-dark' if alu.turno == 'Vespertino' else 'fa-clock text-info') }} me-1"></i>
+                                        {{ alu.turno }}
+                                    </span>
+                                </td>
+                                <td>{{ alu.curp_tutor }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="/admin/editar_alumno/{{ alu.id_alumno }}" class="btn btn-link text-primary p-0 me-2" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-link text-danger p-0" title="Reporte Disciplinario" data-bs-toggle="modal" data-bs-target="#modalReporte{{ alu.id_alumno }}">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+                            {% if not alumnos %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fas fa-user-graduate fa-3x mb-3 opacity-25"></i>
+                                    <p>No hay alumnos registrados todavía.</p>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES DE REPORTES GENERADOS FUERA DE LA TABLA -->
+    {% for alu in alumnos %}
+    <div class="modal fade" id="modalReporte{{ alu.id_alumno }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/admin/guardar_reporte" method="POST">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Nuevo Reporte - {{ alu.nombre }} {{ alu.apellido }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <input type="hidden" name="id_alumno" value="{{ alu.id_alumno }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Fecha del Incidente</label>
+                            <input type="date" name="fecha" class="form-control" required value="2024-04-15">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tipo de Reporte</label>
+                            <select name="tipo_reporte" class="form-select" required>
+                                <option value="Conducta Irregular">Conducta Irregular (Leve)</option>
+                                <option value="Falta de Respeto">Falta de Respeto a Compañero (Grave)</option>
+                                <option value="Falta a Autoridad">Falta de Respeto a Autoridad (Grave)</option>
+                                <option value="Destrucción de Propiedad">Destrucción de Propiedad (Crítico)</option>
+                                <option value="Otro">Otro (Especificar en descripción)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Descripción / Detalles</label>
+                            <textarea name="descripcion" class="form-control" rows="4" required placeholder="Describe detalladamente lo sucedido..."></textarea>
+                        </div>
+                        <div class="alert alert-warning small py-2 mb-0">
+                            <i class="fas fa-info-circle me-1"></i> Este reporte será visible para los padres.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Confirmar Reporte</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const gradoFilter = document.getElementById('gradoFilter');
+            const turnoFilter = document.getElementById('turnoFilter');
+            const rows = document.querySelectorAll('.alumno-row');
+            const countLabel = document.getElementById('alumnoCount');
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const gradoVal = gradoFilter.value;
+                const turnoVal = turnoFilter.value;
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const textContent = row.textContent.toLowerCase();
+                    const rowGrado = row.getAttribute('data-grado');
+                    const rowTurno = row.getAttribute('data-turno');
+
+                    let matchesSearch = textContent.includes(searchTerm);
+                    let matchesGrado = gradoVal === "" || rowGrado === gradoVal;
+                    let matchesTurno = turnoVal === "" || rowTurno === turnoVal;
+
+                    if (matchesSearch && matchesGrado && matchesTurno) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                countLabel.textContent = `${visibleCount} Alumnos`;
+            }
+
+            searchInput.addEventListener('keyup', filterTable);
+            gradoFilter.addEventListener('change', filterTable);
+            turnoFilter.addEventListener('change', filterTable);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

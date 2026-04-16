@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EST 16 - Secundaria Técnica Guillermo Chávez Pérez</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .hero {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+        }
+        .hero > .container { position: relative; z-index: 2; }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center bg-white rounded-3 px-3 py-2 ms-n3 shadow-sm" href="/">
+                <i class="fas fa-school me-2 fs-3 text-primary"></i>
+                <div class="text-dark py-0 my-0" style="line-height:1.2;">
+                   <span class="d-block fw-bold text-primary">EST 16</span>
+                   <small class="fs-6 fw-normal text-secondary">Secundaria Técnica</small>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link px-3" href="/">Inicio</a></li>
+                    
+                    {% for item in menu_dinamico %}
+                        {% if item.children %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle px-3" href="{{ '#' if item.tipo == 'categoria' else '/p/' + item.slug }}" id="navbarDropdown{{ item.id_pagina }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ item.titulo }}
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-sm mt-3" aria-labelledby="navbarDropdown{{ item.id_pagina }}">
+                                    {% for child in item.children %}
+                                        <li><a class="dropdown-item py-2" href="/p/{{ child.slug }}">{{ child.titulo }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link px-3" href="/p/{{ item.slug }}">{{ item.titulo }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <li class="nav-item mx-lg-3 my-2 my-lg-0">
+                        <form action="/buscar" method="GET" class="d-flex bg-white rounded-pill overflow-hidden shadow-sm px-2 py-1">
+                            <input type="text" name="q" class="form-control border-0 bg-transparent shadow-none" placeholder="Buscar sitio...">
+                            <button class="btn border-0 shadow-none text-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </li>
+
+                    {% if session.get('usuario_id') %}
+                        <li class="nav-item"><a href="/perfil" class="btn btn-outline-light rounded-pill px-4 fw-bold shadow-sm">Mi Perfil</a></li>
+                    {% else %}
+                        <li class="nav-item"><a href="/login" class="btn btn-light text-primary rounded-pill px-4 fw-bold shadow-sm">Acceder</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero shadow-lg">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 py-5">
+                    <span class="badge bg-light text-primary px-3 py-2 rounded-pill shadow-sm mb-3"><i class="fas fa-star me-1"></i> Secundaria Técnica Guillermo Chávez Pérez</span>
+                    <h1 class="display-3 fw-bold mb-4" style="text-shadow: 0 4px 6px rgba(0,0,0,0.1);">Excelencia Educativa <br>y Compromiso Institucional</h1>
+                    <p class="lead mb-5 opacity-75 fs-4">Formamos estudiantes con habilidades prácticas y valores sólidos para enfrentar los retos del futuro tecnológico.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#avisos" class="btn btn-light text-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"><i class="fas fa-newspaper me-2"></i>Ver Avisos</a>
+                        <a href="#talleres" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-bold"><i class="fas fa-tools me-2"></i>Nuestros Talleres</a>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block text-center">
+                    <i class="fas fa-graduation-cap text-white opacity-25" style="font-size: 20rem; transform: rotate(15deg);"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECCIÓN DE AVISOS -->
+    <section id="avisos" class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0"><i class="fas fa-bullhorn text-primary me-2"></i> Avisos y Comunicados</h2>
+                </div>
+                <a href="/buscar?q=aviso" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">Ver todos los avisos</a>
+            </div>
+
+            <div class="row g-4">
+                {% if avisos %}
+                    {% for aviso in avisos[:3] %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-5px)';" onmouseout="this.style.transform='translateY(0)';">
+                            {% if aviso.imagen_url %}
+                                <img src="{{ url_for('static', filename='uploads/' + aviso.imagen_url) }}" class="card-img-top" alt="{{ aviso.titulo }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-newspaper fa-3x opacity-25"></i>
+                                </div>
+                            {% endif %}
+                            <div class="p-4">
+                                <span class="badge bg-primary-subtle text-primary border-0 px-2 py-1 mb-3 d-inline-block small fw-bold"><i class="fas fa-tag me-1"></i> Noticia</span>
+                                <h5 class="fw-bold mb-3">{{ aviso.titulo }}</h5>
+                                <p class="text-secondary small mb-4">{{ aviso.contenido[:120] }}...</p>
+                                <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-auto">
+                                    <small class="text-muted"><i class="far fa-calendar me-1"></i> {{ aviso.fecha_creacion }}</small>
+                                    <a href="/aviso/{{ aviso.id_post }}" class="text-primary fw-bold text-decoration-none small">Leer más</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5 text-muted">
+                        <p>No hay avisos recientes en este momento.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE TALLERES -->
+    <section id="talleres" class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="text-center mb-5 border-bottom pb-4">
+                <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm mb-3 border"><i class="fas fa-hammer me-1"></i> Oferta Educativa</span>
+                <h2 class="fw-bold text-dark mb-0">Talleres Tecnológicos</h2>
+            </div>
+
+            <div class="row g-4">
+                {% if talleres %}
+                    {% for t in talleres %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" onclick="window.location.href='/p/{{ t.slug }}'" style="cursor: pointer; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)';" onmouseout="this.style.transform='translateY(0)';">
+                            {% if t.imagen_url %}
+                                <img src="/static/images/{{ t.imagen_url }}" class="card-img-top border-bottom" alt="{{ t.titulo }}" onerror="this.src='/static/uploads/{{ t.imagen_url }}'; this.onerror=function(){this.src='https://via.placeholder.com/400x200?text={{ t.titulo }}'};" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-tools fa-3x text-primary opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            <div class="p-4">
+                                <h5 class="fw-bold mb-2">{{ t.titulo }}</h5>
+                                <p class="text-secondary small mb-3">{{ t.contenido[:100] }}...</p>
+                                <span class="text-primary small fw-bold">Ver especialidad <i class="fas fa-chevron-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- PÁGINAS DESTACADAS -->
+    {% if paginas_inicio %}
+    <section class="section-padding">
+        <div class="container">
+            {% for p in paginas_inicio %}
+            <div class="row align-items-center g-5 mb-5 py-4">
+                <div class="col-lg-6 {{ 'order-lg-2' if loop.index is even else '' }}">
+                    {% if p.imagen_url %}
+                        <img src="/static/uploads/{{ p.imagen_url }}" class="img-fluid rounded-4 border shadow-sm" alt="{{ p.titulo }}">
+                    {% else %}
+                        <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 350px;">
+                            <i class="fas fa-layer-group fa-4x opacity-10"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6">
+                    <span class="badge bg-primary-subtle text-primary border-0 rounded px-3 py-2 mb-3 small fw-bold">Página Informativa</span>
+                    <h2 class="fw-bold mb-4" style="color: var(--primary);">{{ p.titulo }}</h2>
+                    <p class="text-secondary fs-5 mb-4">{{ p.contenido[:350] }}...</p>
+                    <a href="/p/{{ p.slug }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Continuar leyendo <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <h5 class="fw-bold text-dark mb-4">Escuela Secundaria Técnica Núm. 16</h5>
+                    <p class="text-secondary mb-4" style="max-width: 500px;">Institución comprometida con la formación integral de técnicos competitivos en el estado.</p>
+                    <div class="d-flex gap-3 fs-3">
+                        <i class="fab fa-facebook text-secondary"></i>
+                        <i class="fab fa-twitter text-secondary"></i>
+                        <i class="fab fa-instagram text-secondary"></i>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="fw-bold text-dark mb-4">Contacto</h5>
+                    <p class="text-secondary small mb-2"><i class="fas fa-map-marker-alt me-2"></i> Av. Tecnológico s/n, CP 12345</p>
+                    <p class="text-secondary small mb-2"><i class="fas fa-phone me-2"></i> +52 (55) 1234 5678</p>
+                    <p class="text-secondary small"><i class="fas fa-envelope me-2"></i> contacto@est16.edu.mx</p>
+                </div>
+            </div>
+            <div class="mt-5 pt-4 text-center border-top">
+                <p class="text-muted small">&copy; 2024 EST 16 Guillermo Chávez Pérez. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
