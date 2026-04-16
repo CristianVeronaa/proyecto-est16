@@ -19,7 +19,8 @@ def get_db_connection():
         host=os.getenv('DB_HOST', 'localhost'),
         user=os.getenv('DB_USER', 'root'),
         password=os.getenv('DB_PASS', ''),
-        database=os.getenv('DB_NAME', 'control_est16')
+        database=os.getenv('DB_NAME', 'control_est16'),
+        port=int(os.getenv('DB_PORT', 3306))
     )
 
 # 1.1 CONTEXT PROCESSOR: Menú dinámico para todas las plantillas
@@ -1190,4 +1191,5 @@ def eliminar_pagina(id_pagina):
     return redirect(url_for('gestionar_paginas'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
